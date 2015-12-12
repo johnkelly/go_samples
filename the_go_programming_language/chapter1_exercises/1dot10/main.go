@@ -3,38 +3,48 @@ package main
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 func main() {
 	start := time.Now()
-	ch := make(chan string)
+
 	for _, url := range os.Args[1:] {
-		go fetch(url, ch)
-	}
-	for range os.Args[1:] {
-		fmt.Println(<-ch)
+		fetch(url)
 	}
 	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
 }
 
-func fetch(url string, ch chan<- string) {
+func fetch(url string) {
 	start := time.Now()
 	resp, err := http.Get(url)
 	if err != nil {
-		ch <- fmt.Sprint(err)
+		fmt.Println(err)
 		return
 	}
 
-	nbytes, err := io.Copy(ioutil.Discard, resp.Body)
+	random := strconv.Itoa(rand.Intn(1000))
+
+	fileName := random + "_results.html"
+	file, err := os.Create(fileName)
+
+	if err != nil {
+		fmt.Println("File messed up!")
+	}
+
+	defer file.Close()
+
+	nbytes, err := io.Copy(file, resp.Body)
+
 	resp.Body.Close()
 	if err != nil {
-		ch <- fmt.Sprintf("while reading %s: %v", url, err)
+		fmt.Printf("while reading %s: %v", url, err)
 		return
 	}
 	secs := time.Since(start).Seconds()
-	ch <- fmt.Sprintf("%.2fs  %7d  %s", secs, nbytes, url)
+	fmt.Printf("%.2fs  %7d  %s\n", secs, nbytes, url)
 }

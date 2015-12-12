@@ -31,10 +31,10 @@ func main() {
 		urls = append(urls, "http://"+record[1])
 	}
 
-	for _, url := range urls[1000:1500] {
+	for _, url := range urls[2000:2500] {
 		go fetch(url, ch)
 	}
-	for range urls[:1000] {
+	for range urls[2000:2500] {
 		fmt.Println(<-ch)
 	}
 	fmt.Printf("%.2fs elapsed\n", time.Since(start).Seconds())
