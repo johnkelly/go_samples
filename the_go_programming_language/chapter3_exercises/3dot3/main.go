@@ -50,7 +50,7 @@ func main() {
 			// FF = 240 + 15
 			// FF = 255
 
-			//scale 0 to 320 range to 0 -> 255
+			//scale near 0 -> 1.2 z values to range of 0 -> 255
 
 			//if ay,by,cy,dy are close to 0 it is high if close to 320 low
 			// #ff0000 RED peaks
