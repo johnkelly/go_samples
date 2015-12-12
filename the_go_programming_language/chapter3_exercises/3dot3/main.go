@@ -43,8 +43,8 @@ func main() {
 				continue
 			}
 
-			red := uint8(255 - ((az / 1.2) * 255))
-			blue := uint8((az / 1.2) * 255)
+			red := uint8(255 - ((az / 5) * 255))
+			blue := uint8((az / 5) * 255)
 
 			// FF = 15 x 16^1 + 15 * 16^0
 			// FF = 240 + 15
