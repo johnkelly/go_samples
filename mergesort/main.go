@@ -3,59 +3,85 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"os"
+	"strconv"
 	"time"
 )
 
+func shuffle(a []int) {
+	for i := range a {
+		j := rand.Intn(i + 1)
+		a[i], a[j] = a[j], a[i]
+	}
+}
+
 func main() {
-	startTime := time.Now()
-	setSize := 10000000
-	list := rand.Perm(setSize)
+	fmt.Println("What size do you want?")
+	size, err := strconv.Atoi(os.Args[1])
 
-	sort(list)
-	fmt.Println("Time elapsed: ", time.Since(startTime))
-	fmt.Println("Set size: ", setSize)
-}
-
-func splitArray(source []int) ([]int, []int) {
-	return source[0 : len(source)/2], source[len(source)/2:]
-}
-
-func sort(source []int) []int {
-	if len(source) <= 1 {
-		return source
+	if err != nil {
+		fmt.Errorf("Invalid size to sort: %v!", size)
 	}
 
-	left, right := splitArray(source)
-	left = sort(left)
-	right = sort(right)
+	values := make([]int, size)
 
-	return merge(left, right)
+	for i := 0; i <= size-1; i++ {
+		values[i] = i
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	shuffle(values)
+
+	fmt.Println(values)
+	start := time.Now()
+	fmt.Println(MergeSort(values))
+	fmt.Printf("Duration: %s\n", time.Since(start))
 }
 
-func merge(left, right []int) []int {
-	destination := make([]int, len(left)+len(right))
+func MergeSort(list []int) []int {
+	if len(list) == 1 {
+		return list
+	}
 
-	j, k := 0, 0
+	left := list[:len(list)/2]
+	right := list[len(list)/2:]
 
-	for i := 0; i < len(destination); i++ {
-		if j >= len(left) {
-			destination[i] = right[k]
-			k++
-			continue
-		} else if k >= len(right) {
-			destination[i] = left[j]
-			j++
-			continue
+	return merge(MergeSort(left), MergeSort(right))
+}
+
+func merge(left []int, right []int) (result []int) {
+	iterations := len(left) + len(right)
+
+	left_index := 0
+	right_index := 0
+
+	for i := 0; i < iterations; i++ {
+		if left_index >= len(left) {
+			result = append(result, right[right_index:]...)
+			break
 		}
 
-		if left[j] > right[k] {
-			destination[i] = right[k]
-			k++
+		if right_index >= len(right) {
+			result = append(result, left[left_index:]...)
+			break
+		}
+
+		if left[left_index] > right[right_index] {
+			result = append(result, right[right_index])
+			right_index++
 		} else {
-			destination[i] = left[j]
-			j++
+			result = append(result, left[left_index])
+			left_index++
 		}
 	}
 
-	return destination
+	return result
 }
+
+//[]int{8, 6, 1, 7, 5, 9, 3, 2, 4}
+// BenchmarkMergeSort-8	 1000000	      1282 ns/op
+// ok  	github.com/johnkelly/mergesort	1.304s
+
+// 1...1 million
+// BenchmarkMergeSort-8	       3	 426463593 ns/op (.42 sec)
+// ok  	github.com/johnkelly/mergesort	2.608s
