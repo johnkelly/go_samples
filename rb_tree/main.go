@@ -279,12 +279,13 @@ func (t *Tree) Display() {
 	fmt.Printf("Max Depth: %d\n\n", t.Root.maxDepth())
 
 	maxLevel := t.Root.maxDepth() - 1
+	lastLevel := 0
 
 	var queue []*DisplayNode
 	level := 0
 	queue = append(queue, &DisplayNode{Thing: t.Root, Level: level})
 
-	for len(queue) != 0 {
+	for len(queue) != 0 && lastLevel <= maxLevel {
 		element := queue[0]
 		queue = queue[1:]
 
@@ -297,6 +298,12 @@ func (t *Tree) Display() {
 				Level: level + 1,
 			}
 			queue = append(queue, newNode)
+		} else {
+			newNode := &DisplayNode{
+				Thing: &Node{Value: -1, Red: false},
+				Level: level + 1,
+			}
+			queue = append(queue, newNode)
 		}
 
 		if node.Right != nil {
@@ -305,36 +312,20 @@ func (t *Tree) Display() {
 				Level: level + 1,
 			}
 			queue = append(queue, newNode)
+		} else {
+			newNode := &DisplayNode{
+				Thing: &Node{Value: -1, Red: false},
+				Level: level + 1,
+			}
+			queue = append(queue, newNode)
 		}
 
+		if level != lastLevel {
+			fmt.Println("")
+			lastLevel = level
+		}
 		node.display(level, maxLevel)
 	}
-
-	//   6
-	// /   \
-	//3     8
-
-	//     6
-	//   /   \
-	//  3     8
-	// / \   / \
-	//1   5 7   9
-
-	//          6
-	//        /   \
-	//     3          8
-	//   /  \        /  \
-	//  1     5     7     9
-	// / \   / \   / \   / \
-	////x   x x   x x   x x   10
-
-	// whiteRed.Println("HELLO WORLD\n\n\n")
-	// whiteBlack.Println("HELLO WORLD\n\n\n")
-
-	// //BFS and get color from struct
-	// whiteBlack.Printf("%d\n", t.Root.Value)
-	// whiteRed.Printf("%d\n", t.Root.Left.Value)
-	// whiteRed.Printf("%d\n", t.Root.Right.Value)
 }
 
 // Handle nulls better
@@ -352,9 +343,9 @@ func (n *Node) display(level, maxLevel int) {
 	}
 	fmt.Print(msg)
 	if n.Red {
-		whiteRed.Printf("%d\n", n.Value)
+		whiteRed.Printf("%d", n.Value)
 	} else {
-		whiteBlack.Printf("%d\n", n.Value)
+		whiteBlack.Printf("%d", n.Value)
 	}
 }
 
