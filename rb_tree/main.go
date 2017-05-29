@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/fatih/color"
 )
@@ -18,7 +17,7 @@ type Node struct {
 }
 
 func main() {
-	input := []int{3, 1, 5, 7, 6, 8, 9, 10}
+	input := []int{3, 1, 5, 7, 6, 8, 9, 10, 11, 20}
 
 	tree := &Tree{}
 	tree.InsertAll(input)
@@ -273,8 +272,7 @@ type DisplayNode struct {
 	Level int
 }
 
-// Build the queue outside of the display
-// then display all of the queue
+// Works for very small single digit trees
 func (t *Tree) Display() {
 	fmt.Printf("Max Depth: %d\n\n", t.Root.maxDepth())
 
@@ -328,8 +326,6 @@ func (t *Tree) Display() {
 	}
 }
 
-// Handle nulls better
-// What if the numbers are multiple digits...
 func (n *Node) display(level, maxLevel int) {
 	red := color.New(color.FgRed)
 	black := color.New(color.FgBlack)
@@ -337,9 +333,10 @@ func (n *Node) display(level, maxLevel int) {
 	whiteBlack := black.Add(color.BgWhite)
 
 	msg := ""
-	numSpaces := int(math.Pow(2.0, float64(maxLevel)) - math.Pow(2.0, float64(level)))
-	for i := 0; i < numSpaces; i++ {
-		msg += " "
+	numTabs := (maxLevel - level) + 1
+
+	for i := 0; i < numTabs; i++ {
+		msg += "\t"
 	}
 	fmt.Print(msg)
 	if n.Red {
