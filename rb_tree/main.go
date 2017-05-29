@@ -216,6 +216,7 @@ func (t *Tree) Display() {
 }
 
 // Handle nulls better
+// What if the numbers are multiple digits...
 func (n *Node) display(level, maxLevel int) {
 	red := color.New(color.FgRed)
 	black := color.New(color.FgBlack)
@@ -248,35 +249,3 @@ func (n *Node) maxDepth() int {
 		return rightDepth + 1
 	}
 }
-
-// func printTree(Root *Node) (tree string) {
-// 	var queue []*Node
-// 	count := 0
-// 	queue = append(queue, Root)
-
-// 	for len(queue) > 0 {
-// 		element := queue[0]
-// 		if element == nil {
-// 			return tree
-// 		}
-// 		queue = queue[1:]
-// 		count += 1
-
-// 		for i := 0; i < length; i++ {
-// 			tree += " "
-// 		}
-
-// 		tree += fmt.Sprintf("%d", element.value)
-
-// 		for i := 0; i < length; i++ {
-// 			tree += " "
-// 		}
-// 		if Root.left != nil {
-// 			queue = append(queue, element.left)
-// 		}
-// 		if Root.right != nil {
-// 			queue = append(queue, element.right)
-// 		}
-// 	}
-// 	return tree
-// }
