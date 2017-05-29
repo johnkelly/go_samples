@@ -35,6 +35,8 @@ func (t *Tree) Insert(value int) {
 	x := t.Root
 	var y *Node
 
+	// Advance the x pointer to where in the
+	// graph value belongs (iteration)
 	for x != nil {
 		y = x
 		if value < x.Value {
@@ -44,104 +46,224 @@ func (t *Tree) Insert(value int) {
 		}
 	}
 
-	problemNode := &Node{Parent: y, Value: value, Red: true}
+	// Create the new node - new node's are always red
+	newNode := &Node{Parent: y, Value: value, Red: true}
 
+	// Insert the new Node into the graph
 	if y == nil {
-		problemNode.Red = false
-		t.Root = problemNode
+		// The tree is empty
+		newNode.Red = false
+		t.Root = newNode
 		return
-	} else if problemNode.Value < y.Value {
-		y.Left = problemNode
+	} else if newNode.Value < y.Value {
+		// The new value goes on the left
+		y.Left = newNode
 	} else {
-		y.Right = problemNode
+		// The new value goes on the right
+		y.Right = newNode
 	}
-	t.Balance(problemNode)
+	// Rebalance the tree
+	t.Balance(newNode)
 }
 
 func (t *Tree) Balance(problemNode *Node) {
 	var aunt *Node
+	// Advance up the tree to check for violations
 	for problemNode.Parent != nil && problemNode.Parent.Red {
 		if problemNode.Parent == problemNode.Parent.Parent.Left {
 			aunt = problemNode.Parent.Parent.Right
 			if aunt != nil && aunt.Red {
-				// Red Aunt
-				// Color Flip
-				problemNode.Parent.Red = false
-				aunt.Red = false
-				problemNode.Parent.Parent.Red = true
-				problemNode = problemNode.Parent.Parent
+				problemNode = redAunt(problemNode, aunt)
 			} else {
-				// Black Aunt
-				// Rotate
-				if problemNode == problemNode.Parent.Right {
-					problemNode = problemNode.Parent
-					t.leftRotate(problemNode)
-				}
-				problemNode.Parent.Red = false
-				problemNode.Parent.Parent.Red = true
-				t.rightRotate(problemNode.Parent.Parent)
+				t.blackAunt(problemNode, true)
 			}
 		} else {
 			aunt = problemNode.Parent.Parent.Left
 			if aunt != nil && aunt.Red {
-				// Red Aunt
-				//Color Flip
-				problemNode.Parent.Red = false
-				aunt.Red = false
-				problemNode.Parent.Parent.Red = true
-				problemNode = problemNode.Parent.Parent
+				problemNode = redAunt(problemNode, aunt)
 			} else {
-				// Black Aunt
-				// Rotate
-				if problemNode == problemNode.Parent.Left {
-					problemNode = problemNode.Parent
-					t.rightRotate(problemNode)
-				}
-				problemNode.Parent.Red = false
-				problemNode.Parent.Parent.Red = true
-				t.leftRotate(problemNode.Parent.Parent)
+				t.blackAunt(problemNode, false)
 			}
 		}
 	}
 	t.Root.Red = false
 }
 
+// Black Aunt
+func (t *Tree) blackAunt(x *Node, left bool) {
+	// if the work is being down on the left side
+	// of the tree else we are on the right side
+	if left {
+		// parent
+		//  / \
+		//     x
+		// In this case left rotate
+		// bringing grand parent down
+		// and promoting parent up the tree
+		if x == x.Parent.Right {
+			x = x.Parent
+			t.leftRotate(x)
+		}
+		// Same idea as color flip red grand parent
+		// black parents and aunts
+		// we know that the aunt is already black so
+		// we only need to color flip the parent &
+		// grandparent
+		x.Parent.Red = false
+		x.Parent.Parent.Red = true
+
+		// Right Rotate the grandparent as we are
+		// on the left side of the tree
+		t.rightRotate(x.Parent.Parent)
+	} else {
+		// parent
+		//  / \
+		// x
+		// In this case right rotate
+		// bringing grand parent down
+		// and promoting parent up the tree
+		if x == x.Parent.Left {
+			x = x.Parent
+			t.rightRotate(x)
+		}
+		// Same idea as color flip red grand parent
+		// black parents and aunts
+		// we know that the aunt is already black so
+		// we only need to color flip the parent &
+		// grandparent
+		x.Parent.Red = false
+		x.Parent.Parent.Red = true
+
+		// Left Rotate the grandparent as we are
+		// on the right side of the tree
+		t.leftRotate(x.Parent.Parent)
+	}
+}
+
+// Red Aunt
+// Color Flip and then move up the tree
+// to check for further violations
+func redAunt(x, aunt *Node) *Node {
+	colorFlip(x, aunt)
+	return x.Parent.Parent
+}
+
+// Color Flip
+//    red
+//    /  \
+// black black
+// set the Grandparent as red
+// set the aunts & parents to black
+func colorFlip(x, aunt *Node) {
+	x.Parent.Red = false
+	aunt.Red = false
+	x.Parent.Parent.Red = true
+}
+
 // Rotates the subtree counter clockwise
+//     1
+//       \
+//         2
+//          \
+//           3
 func (t *Tree) leftRotate(x *Node) {
+	// x is 1
+
+	// assign a pointer to the 2
 	y := x.Right
+
+	// set the right of 1 to null
+	// 1
+	//
+	// 2
+	//  \
+	//   3
 	x.Right = y.Left
 
 	if y.Left != nil {
+		// if 2 has a child on left
+		// make it's parent 1
 		y.Left.Parent = x
 	}
+	// set the parent of 1 to be the parent of 2
+	// 2
+	//  \
+	//   3
+	//
+	// 1
 	y.Parent = x.Parent
 	if x.Parent == nil {
+		// connect the 2\3 subtree to the rest
+		// of the tree as the root
 		t.Root = y
 	} else if x == x.Parent.Left {
+		// connect the 2\3 subtree to the rest
+		// of the tree on the left side
 		x.Parent.Left = y
 	} else {
+		// connect the 2\3 subtree to the rest
+		// of the tree on the right side
 		x.Parent.Right = y
 	}
+	// reconnect the 1 subtree to the 2/3
+	// subtree on the left side
+	//      2
+	//     / \
+	//    1   3
 	y.Left = x
 	x.Parent = y
 }
 
 // Rotates the subtree clockwise
+//                  3
+//								/
+//							2
+//            /
+//           1
 func (t *Tree) rightRotate(x *Node) {
+	// x is 3
+
+	// assign a pointer to the 2
 	y := x.Left
+
+	// set the left of 3 to null
+	// 3
+	//
+	//     2
+	//   /
+	//  1
 	x.Left = y.Right
 
 	if y.Right != nil {
+		// if 2 has a child on right
+		// make it's parent 3
 		y.Right.Parent = x
 	}
+	// set the parent of 3 to be the parent of 2
+	//     2
+	//   /
+	//  1
+	//
+	// 3
 	y.Parent = x.Parent
 	if x.Parent == nil {
+		// connect the 2/1 subtree to the rest
+		// of the tree as the root
 		t.Root = y
 	} else if x == x.Parent.Left {
+		// connect the 2\1 subtree to the rest
+		// of the tree on the left side
 		x.Parent.Left = y
 	} else {
+		// connect the 2\1 subtree to the rest
+		// of the tree on the right side
 		x.Parent.Right = y
 	}
+	// reconnect the 3 subtree to the 2/1
+	// subtree on the right side
+	//      2
+	//     / \
+	//    1   3
 	y.Right = x
 	x.Parent = y
 }
