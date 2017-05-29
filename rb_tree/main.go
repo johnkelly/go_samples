@@ -215,11 +215,11 @@ func (t *Tree) leftRotate(x *Node) {
 }
 
 // Rotates the subtree clockwise
-//                  3
-//								/
-//							2
-//            /
-//           1
+//						3
+//					/
+//				2
+//			/
+//		1
 func (t *Tree) rightRotate(x *Node) {
 	// x is 3
 
