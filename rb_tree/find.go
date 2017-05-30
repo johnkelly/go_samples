@@ -1,6 +1,10 @@
 package main
 
-func (t *Tree) FindRecursive(n *Node, value int) *Node {
+func (t *Tree) FindRecursive(value int) *Node {
+	return t.FindRecursiveHelper(t.Root, value)
+}
+
+func (t *Tree) FindRecursiveHelper(n *Node, value int) *Node {
 	if n == nil {
 		return nil
 	}
@@ -10,9 +14,9 @@ func (t *Tree) FindRecursive(n *Node, value int) *Node {
 	}
 
 	if value < n.Value {
-		return t.FindRecursive(n.Left, value)
+		return t.FindRecursiveHelper(n.Left, value)
 	} else {
-		return t.FindRecursive(n.Right, value)
+		return t.FindRecursiveHelper(n.Right, value)
 	}
 	return nil
 }

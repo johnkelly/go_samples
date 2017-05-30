@@ -21,8 +21,8 @@ func main() {
 	fmt.Printf("Find Results for 4: %v\n", tree.FindIterative(4))
 	fmt.Printf("Find Results for 10: %v\n", tree.FindIterative(10))
 
-	fmt.Printf("Find Results for 4: %v\n", tree.FindRecursive(tree.Root, 4))
-	fmt.Printf("Find Results for 10: %v\n", tree.FindRecursive(tree.Root, 10))
+	fmt.Printf("Find Results for 4: %v\n", tree.FindRecursive(4))
+	fmt.Printf("Find Results for 10: %v\n", tree.FindRecursive(10))
 }
 
 func (t *Tree) InsertAll(values []int) {

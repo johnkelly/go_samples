@@ -25,7 +25,7 @@ func TestFindRecursive(t *testing.T) {
 	tree.InsertAll(input)
 
 	for _, assertion := range assertions {
-		result := tree.FindRecursive(tree.Root, assertion.input)
+		result := tree.FindRecursive(assertion.input)
 		if result != nil && result.Value != assertion.expected {
 			t.Errorf("Finding %d - Expected to find node with %d, got %v.", assertion.input, assertion.expected, result)
 		} else if result == nil && assertion.expected != nil {
@@ -34,7 +34,7 @@ func TestFindRecursive(t *testing.T) {
 	}
 
 	tree = &Tree{}
-	result := tree.FindRecursive(tree.Root, 100)
+	result := tree.FindRecursive(100)
 	if result != nil {
 		t.Error("Finding 100 in empty tree - Expected nil")
 	}
@@ -50,7 +50,7 @@ func BenchmarkFindRecursive(b *testing.B) {
 	}
 
 	for i := 0; i < b.N; i++ {
-		tree.FindRecursive(tree.Root, rand.Intn(size))
+		tree.FindRecursive(rand.Intn(size))
 	}
 }
 
