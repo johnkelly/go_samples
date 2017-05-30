@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 type Tree struct {
 	Root *Node
@@ -23,6 +26,57 @@ func main() {
 
 	fmt.Printf("Find Results for 4: %v\n", tree.FindRecursive(4))
 	fmt.Printf("Find Results for 10: %v\n", tree.FindRecursive(10))
+
+	f, err := os.OpenFile("tree.txt", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 777)
+	if err != nil {
+		panic("Can't open file to write tree")
+	}
+	defer f.Close()
+
+	tree.Serialize(tree.Root, f)
+
+	f, err = os.OpenFile("tree.txt", os.O_RDONLY, 777)
+	if err != nil {
+		panic("Can't open file to write tree")
+	}
+	defer f.Close()
+
+	var root *Node
+	root = DeSerialize(root, f)
+	tree = &Tree{Root: root}
+	tree.Display()
+}
+
+func (t *Tree) Serialize(n *Node, f *os.File) {
+	if n == nil {
+		fmt.Fprintf(f, "%d|%t,", -1, false)
+		return
+	}
+	fmt.Fprintf(f, "%d|%t,", n.Value, n.Red)
+
+	t.Serialize(n.Left, f)
+	t.Serialize(n.Right, f)
+}
+
+func DeSerialize(n *Node, f *os.File) *Node {
+	var value int
+	var red bool
+
+	_, err := fmt.Fscanf(f, "%d|%t,", &value, &red)
+	if err != nil {
+		return nil
+	}
+
+	if value == -1 {
+		return nil
+	}
+
+	n = &Node{Value: value, Red: red}
+
+	n.Left = DeSerialize(n.Left, f)
+	n.Right = DeSerialize(n.Right, f)
+
+	return n
 }
 
 func (t *Tree) InsertAll(values []int) {
