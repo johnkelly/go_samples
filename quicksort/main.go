@@ -34,7 +34,7 @@ func main() {
 
 	fmt.Println(values)
 	start := time.Now()
-	fmt.Println(QuickSort(values))
+	fmt.Println(InPlaceQuickSort(values))
 	fmt.Printf("Duration: %s\n", time.Since(start))
 }
 
@@ -65,6 +65,45 @@ func merge(left []int, pivot int, right []int) (result []int) {
 	result = append(result, pivot)
 	result = append(result, right...)
 	return result
+}
+
+var elements []int
+
+func InPlaceQuickSort(list []int) []int {
+	elements = list
+	low := 0
+	high := len(list) - 1
+
+	InPlaceHelper(low, high)
+	return list
+}
+
+func InPlaceHelper(low int, high int) {
+	if high-low <= 1 {
+		if elements[low] > elements[high] {
+			elements[low], elements[high] = elements[high], elements[low]
+		} else if high <= low {
+		} else {
+			pivotIndex := low
+			partitionIndex := partition(low, high, pivotIndex)
+			InPlaceHelper(low, partitionIndex-1)
+			InPlaceHelper(partitionIndex+1, high)
+		}
+	}
+}
+
+func partition(low, high, pivotIndex int) int {
+	i := low
+
+	for j := low; j <= high; j++ {
+		if elements[j] < elements[pivotIndex] {
+			i++
+			elements[i], elements[j] = elements[j], elements[i]
+		}
+	}
+
+	elements[i], elements[pivotIndex] = elements[pivotIndex], elements[i]
+	return i
 }
 
 // A million
