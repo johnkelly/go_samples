@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+	"strconv"
 )
 
 type Tree struct {
@@ -16,35 +18,45 @@ type Node struct {
 }
 
 func main() {
-	input := []int{3, 1, 5, 7, 6, 8, 9, 10, 11, 20}
+	input := os.Args[1:]
+	// input := []int{3, 1, 5, 7, 6, 8, 9, 10, 11, 20}
+	nums := []int{}
+	for _, str := range input {
+		num, err := strconv.Atoi(str)
+		if err != nil {
+			log.Printf("Unable to parse: %s", str)
+			continue
+		}
+		nums = append(nums, num)
+	}
 
 	tree := &Tree{}
-	tree.InsertAll(input)
+	tree.InsertAll(nums)
 	tree.Display()
-	fmt.Printf("Find Results for 4: %v\n", tree.FindIterative(4))
-	fmt.Printf("Find Results for 10: %v\n", tree.FindIterative(10))
 
-	fmt.Printf("Find Results for 4: %v\n", tree.FindRecursive(4))
-	fmt.Printf("Find Results for 10: %v\n", tree.FindRecursive(10))
+	// fmt.Printf("Find Results for 4: %v\n", tree.FindIterative(4))
+	// fmt.Printf("Find Results for 10: %v\n", tree.FindIterative(10))
 
-	f, err := os.OpenFile("tree.txt", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 777)
-	if err != nil {
-		panic("Can't open file to write tree")
-	}
-	defer f.Close()
+	// fmt.Printf("Find Results for 4: %v\n", tree.FindRecursive(4))
+	// fmt.Printf("Find Results for 10: %v\n", tree.FindRecursive(10))
 
-	tree.Serialize(tree.Root, f)
+	// f, err := os.OpenFile("tree.txt", os.O_CREATE|os.O_APPEND|os.O_WRONLY, 777)
+	// if err != nil {
+	// 	panic("Can't open file to write tree")
+	// }
+	// defer f.Close()
 
-	f, err = os.OpenFile("tree.txt", os.O_RDONLY, 777)
-	if err != nil {
-		panic("Can't open file to write tree")
-	}
-	defer f.Close()
+	// tree.Serialize(tree.Root, f)
 
-	var root *Node
-	root = DeSerialize(root, f)
-	tree = &Tree{Root: root}
-	tree.Display()
+	// f, err = os.OpenFile("tree.txt", os.O_RDONLY, 777)
+	// if err != nil {
+	// 	panic("Can't open file to write tree")
+	// }
+	// defer f.Close()
+
+	// var root *Node
+	// root = DeSerialize(root, f)
+	// tree = &Tree{Root: root}
 }
 
 func (t *Tree) Serialize(n *Node, f *os.File) {

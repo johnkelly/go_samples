@@ -1,86 +1,111 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
-
-	"github.com/fatih/color"
+	"os"
 )
 
-type DisplayNode struct {
-	Thing *Node
-	Level int
+type Font struct {
+	Color string `json:"color"`
 }
 
-// Works for very small single digit trees
+type jsonNode struct {
+	ID    int    `json:"id"`
+	Color string `json:"color"`
+	Label string `json:"label"`
+	Font  *Font  `json:"font"`
+	node  *Node
+}
+
+type jsonEdge struct {
+	From int `json:"from"`
+	To   int `json:"to"`
+}
+
+var jsonNodes []*jsonNode
+var jsonEdges []*jsonEdge
+
+func colorToString(n *Node) string {
+	if n.Red {
+		return "red"
+	}
+	return "black"
+}
+
 func (t *Tree) Display() {
-	fmt.Printf("Max Depth: %d\n\n", t.Root.maxDepth())
+	f, err := os.OpenFile("nodes.json", os.O_CREATE|os.O_WRONLY, 777)
+	if err != nil {
+		panic("Can't write to nodes.json")
+	}
 
-	maxLevel := t.Root.maxDepth() - 1
-	lastLevel := 0
+	t.formatForVisJS()
+	bytes, err := json.Marshal(jsonNodes)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprint(f, string(bytes))
 
-	var queue []*DisplayNode
-	level := 0
-	queue = append(queue, &DisplayNode{Thing: t.Root, Level: level})
+	f, err = os.OpenFile("edges.json", os.O_CREATE|os.O_WRONLY, 777)
+	if err != nil {
+		panic("Can't write to edges.json")
+	}
 
-	for len(queue) != 0 && lastLevel <= maxLevel {
+	bytes, err = json.Marshal(jsonEdges)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprint(f, string(bytes))
+}
+
+func (t *Tree) formatForVisJS() {
+	newNode := &jsonNode{
+		ID:    t.Root.Value,
+		Color: colorToString(t.Root),
+		Label: fmt.Sprintf("Node: %d", t.Root.Value),
+		Font:  &Font{Color: "white"},
+		node:  t.Root,
+	}
+	queue := []*jsonNode{newNode}
+	jsonNodes = append(jsonNodes, newNode)
+
+	for len(queue) != 0 {
 		element := queue[0]
 		queue = queue[1:]
 
-		node := element.Thing
-		level := element.Level
+		node := element.node
 
 		if node.Left != nil {
-			newNode := &DisplayNode{
-				Thing: node.Left,
-				Level: level + 1,
+			newNode := &jsonNode{
+				ID:    node.Left.Value,
+				Color: colorToString(node.Left),
+				Label: fmt.Sprintf("Node: %d", node.Left.Value),
+				Font:  &Font{Color: "white"},
+				node:  node.Left,
 			}
-			queue = append(queue, newNode)
-		} else {
-			newNode := &DisplayNode{
-				Thing: &Node{Value: -1, Red: false},
-				Level: level + 1,
+			newEdge := &jsonEdge{
+				From: node.Value,
+				To:   node.Left.Value,
 			}
+			jsonEdges = append(jsonEdges, newEdge)
 			queue = append(queue, newNode)
+			jsonNodes = append(jsonNodes, newNode)
 		}
-
 		if node.Right != nil {
-			newNode := &DisplayNode{
-				Thing: node.Right,
-				Level: level + 1,
+			newNode := &jsonNode{
+				ID:    node.Right.Value,
+				Color: colorToString(node.Right),
+				Label: fmt.Sprintf("Node: %d", node.Right.Value),
+				Font:  &Font{Color: "white"},
+				node:  node.Right,
 			}
-			queue = append(queue, newNode)
-		} else {
-			newNode := &DisplayNode{
-				Thing: &Node{Value: -1, Red: false},
-				Level: level + 1,
+			newEdge := &jsonEdge{
+				From: node.Value,
+				To:   node.Right.Value,
 			}
+			jsonEdges = append(jsonEdges, newEdge)
 			queue = append(queue, newNode)
+			jsonNodes = append(jsonNodes, newNode)
 		}
-
-		if level != lastLevel {
-			fmt.Println("")
-			lastLevel = level
-		}
-		node.display(level, maxLevel)
-	}
-}
-
-func (n *Node) display(level, maxLevel int) {
-	red := color.New(color.FgRed)
-	black := color.New(color.FgBlack)
-	whiteRed := red.Add(color.BgWhite)
-	whiteBlack := black.Add(color.BgWhite)
-
-	msg := ""
-	numTabs := (maxLevel - level) + 1
-
-	for i := 0; i < numTabs; i++ {
-		msg += "\t"
-	}
-	fmt.Print(msg)
-	if n.Red {
-		whiteRed.Printf("%d", n.Value)
-	} else {
-		whiteBlack.Printf("%d", n.Value)
 	}
 }

@@ -1,0 +1,49 @@
+<html>
+<head>
+    <script type="text/javascript" src="./dist/vis.js"></script>
+    <link href="./dist/vis.css" rel="stylesheet" type="text/css" />
+
+    <style type="text/css">
+        #mynetwork {
+            width: 900px;
+            height: 700px;
+            border: 1px solid lightgray;
+        }
+    </style>
+</head>
+<body>
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+  fetch("nodes.json")
+    .then(response => response.json())
+    .then(function(json) {
+      var nodes = new vis.DataSet(json);
+
+      fetch("edges.json")
+        .then(response => response.json())
+        .then(function(json) {
+          var edges = new vis.DataSet(json);
+
+          var container = document.getElementById('mynetwork');
+          var data = {
+            nodes: nodes,
+            edges: edges
+          };
+          var options = {
+            layout: {
+              hierarchical: {
+                sortMethod: "directed"
+              }
+            },
+            edges: {
+              smooth: true,
+              arrows: {to : true}
+            }
+          };
+          var network = new vis.Network(container, data, options);
+        });
+    });
+</script>
+</body>
+</html>
