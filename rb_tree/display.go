@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"os"
+	"io/ioutil"
 )
 
 type Font struct {
@@ -34,28 +34,20 @@ func colorToString(n *Node) string {
 }
 
 func (t *Tree) Display() {
-	f, err := os.OpenFile("nodes.json", os.O_CREATE|os.O_WRONLY, 777)
-	if err != nil {
-		panic("Can't write to nodes.json")
-	}
-
 	t.formatForVisJS()
-	bytes, err := json.Marshal(jsonNodes)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprint(f, string(bytes))
 
-	f, err = os.OpenFile("edges.json", os.O_CREATE|os.O_WRONLY, 777)
-	if err != nil {
-		panic("Can't write to edges.json")
-	}
+	bytes, err := json.Marshal(jsonNodes)
+	writeJSONFile("nodes.json", bytes, err)
 
 	bytes, err = json.Marshal(jsonEdges)
+	writeJSONFile("edges.json", bytes, err)
+}
+
+func writeJSONFile(name string, bytes []byte, err error) {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Fprint(f, string(bytes))
+	ioutil.WriteFile(name, bytes, 0644)
 }
 
 func (t *Tree) formatForVisJS() {
