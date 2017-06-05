@@ -8,6 +8,12 @@
 * Go to localhost:8888
 * ./rb_tree 100 99 98 97 96 95 94 50 49 52
 
+* Refresh localhost:8888
+* ./rb_tree 100 99 98 97 96 95 94 50 49 52 78
+
+* Refresh localhost:8888
+* etc...
+
 ## A few other functions are working but commented out at the moment
 * Serialization
 * Deserialization
