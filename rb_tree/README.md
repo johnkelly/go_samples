@@ -1,3 +1,7 @@
+## Example Output
+![alt text](https://github.com/johnkelly/go_samples/blob/master/rb_tree/example_output.png "Red Black Tree")
+
+
 ## How to Run
 * python -m SimpleHTTPServer 8888
 
