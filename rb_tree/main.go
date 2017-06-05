@@ -141,14 +141,14 @@ func (t *Tree) Balance(problemNode *Node) {
 			if aunt != nil && aunt.Red {
 				problemNode = redAunt(problemNode, aunt)
 			} else {
-				t.blackAunt(problemNode, true)
+				problemNode = t.blackAunt(problemNode, true)
 			}
 		} else {
 			aunt = problemNode.Parent.Parent.Left
 			if aunt != nil && aunt.Red {
 				problemNode = redAunt(problemNode, aunt)
 			} else {
-				t.blackAunt(problemNode, false)
+				problemNode = t.blackAunt(problemNode, false)
 			}
 		}
 	}
@@ -156,7 +156,7 @@ func (t *Tree) Balance(problemNode *Node) {
 }
 
 // Black Aunt
-func (t *Tree) blackAunt(x *Node, left bool) {
+func (t *Tree) blackAunt(x *Node, left bool) *Node {
 	// if the work is being down on the left side
 	// of the tree else we are on the right side
 	if left {
@@ -204,6 +204,7 @@ func (t *Tree) blackAunt(x *Node, left bool) {
 		// on the right side of the tree
 		t.leftRotate(x.Parent.Parent)
 	}
+	return x
 }
 
 // Red Aunt
