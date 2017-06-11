@@ -11,7 +11,7 @@ type Node struct {
 	hash  string
 }
 
-type MerkleTree struct {
+type Tree struct {
 	root *Node
 }
 
@@ -20,13 +20,10 @@ func main() {
 	hashes := generateHashes(values)
 	nodes := generateNodes(hashes)
 
-	tree := &MerkleTree{root: buildMerkleTree(nodes)}
+	tree := &Tree{root: buildMerkleTree(nodes)}
 
 	fmt.Printf("Merkle Root:\t%v\n", tree.root.hash)
-	fmt.Printf("Merkle Left:\t%v\n", tree.root.left.hash)
-	fmt.Printf("Merkle Right:\t%v\n", tree.root.right.hash)
-
-	// tree.Display()
+	tree.Display()
 }
 
 func buildMerkleTree(nodes []*Node) *Node {
@@ -45,10 +42,6 @@ func buildMerkleTree(nodes []*Node) *Node {
 				hash:  combinedHash(nodes[i].hash, nodes[i+1].hash),
 			}
 
-			fmt.Printf("HashA: %v\n", nodes[i].hash)
-			fmt.Printf("HashB: %v\n\n", nodes[i+1].hash)
-			fmt.Printf("Combined Hash: %v\n\n", newNode.hash)
-
 			newNodes = append(newNodes, newNode)
 		}
 		nodes = newNodes
@@ -58,7 +51,6 @@ func buildMerkleTree(nodes []*Node) *Node {
 
 func combinedHash(hashA, hashB string) string {
 	combined := hashA + hashB
-	fmt.Printf("COMBINED: %v\n", combined)
 	hash := sha256.Sum256([]byte(combined))
 	return fmt.Sprintf("%X", hash)
 }
