@@ -1,6 +1,11 @@
-FROM golang:latest
-WORKDIR /go/src/github.com/johnkelly/server/
-COPY main.go .
-RUN go build -o app .
+# build stage
+FROM golang:alpine AS build-env
+ADD . /src
+RUN cd /src && go build -o app
 
-CMD ["./app"]
+# final stage
+FROM alpine
+WORKDIR /app
+COPY --from=build-env /src/app /app/
+EXPOSE 5000
+ENTRYPOINT ./app
